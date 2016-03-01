@@ -1,4 +1,5 @@
-﻿using Shadowsocks.Model;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,10 @@ namespace Shadowsocks.View
     public partial class Login : Form
     {
         Configuration config = Configuration.Load();
-        public Login()
+        ShadowsocksController controller;
+        public Login(ShadowsocksController _controller)
         {
+            controller = _controller;
             this.Font = System.Drawing.SystemFonts.MessageBoxFont;
             InitializeComponent();
 
@@ -30,6 +33,7 @@ namespace Shadowsocks.View
             {
                 config.cdkey = tbCdkey.Text;
                 Configuration.Save(config);
+                controller.Reload();
                 this.Close();
             }
             else

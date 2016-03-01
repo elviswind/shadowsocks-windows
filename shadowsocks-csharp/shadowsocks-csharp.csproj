@@ -22,6 +22,8 @@
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -36,8 +38,6 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -170,9 +170,6 @@
     <Compile Include="3rd\zxing\ResultPoint.cs" />
     <Compile Include="3rd\zxing\ResultPointCallback.cs" />
     <Compile Include="3rd\zxing\WriterException.cs" />
-    <Compile Include="Controller\Service\AvailabilityStatistics.cs" />
-    <Compile Include="Controller\Strategy\HighAvailabilityStrategy.cs" />
-    <Compile Include="Controller\Strategy\StatisticsStrategy.cs" />
     <Compile Include="Controller\System\AutoStartup.cs" />
     <Compile Include="Controller\FileManager.cs" />
     <Compile Include="Controller\Service\GFWListUpdater.cs" />
@@ -196,15 +193,11 @@
     <Compile Include="Model\LogViewerConfig.cs" />
     <Compile Include="Model\Server.cs" />
     <Compile Include="Model\Configuration.cs" />
-    <Compile Include="Model\StatisticsStrategyConfiguration.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Controller\Strategy\BalancingStrategy.cs" />
-    <Compile Include="Controller\Strategy\StrategyManager.cs" />
-    <Compile Include="Controller\Strategy\IStrategy.cs" />
     <Compile Include="StringEx.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="Controller\Service\TCPRelay.cs" />
@@ -218,12 +211,6 @@
     </Compile>
     <Compile Include="View\CalculationControl.Designer.cs">
       <DependentUpon>CalculationControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="View\LogForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="View\LogForm.Designer.cs">
-      <DependentUpon>LogForm.cs</DependentUpon>
     </Compile>
     <Compile Include="View\Login.cs">
       <SubType>Form</SubType>
@@ -241,12 +228,6 @@
     <Compile Include="View\QRCodeSplashForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\StatisticsStrategyConfigurationForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="View\StatisticsStrategyConfigurationForm.Designer.cs">
-      <DependentUpon>StatisticsStrategyConfigurationForm.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
@@ -255,17 +236,11 @@
     <EmbeddedResource Include="View\CalculationControl.resx">
       <DependentUpon>CalculationControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="View\LogForm.resx">
-      <DependentUpon>LogForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="View\Login.resx">
       <DependentUpon>Login.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\QRCodeForm.resx">
       <DependentUpon>QRCodeForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="View\StatisticsStrategyConfigurationForm.resx">
-      <DependentUpon>StatisticsStrategyConfigurationForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="app.manifest">

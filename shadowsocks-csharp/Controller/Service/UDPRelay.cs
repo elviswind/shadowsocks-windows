@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 
-using Shadowsocks.Controller.Strategy;
 using Shadowsocks.Encryption;
 using Shadowsocks.Model;
 
@@ -39,7 +38,7 @@ namespace Shadowsocks.Controller
             UDPHandler handler = _cache.get(remoteEndPoint);
             if (handler == null)
             {
-                handler = new UDPHandler(socket, _controller.GetAServer(IStrategyCallerType.UDP, remoteEndPoint), remoteEndPoint);
+                handler = new UDPHandler(socket, _controller.GetAServer(remoteEndPoint), remoteEndPoint);
                 _cache.add(remoteEndPoint, handler);
             }
             handler.Send(firstPacket, length);

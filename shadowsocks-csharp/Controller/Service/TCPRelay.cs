@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Timers;
 
-using Shadowsocks.Controller.Strategy;
 using Shadowsocks.Encryption;
 using Shadowsocks.Model;
 
@@ -135,7 +134,7 @@ namespace Shadowsocks.Controller
 
         public void CreateRemote()
         {
-            Server server = controller.GetAServer(IStrategyCallerType.TCP, (IPEndPoint)connection.RemoteEndPoint);
+            Server server = controller.GetAServer((IPEndPoint)connection.RemoteEndPoint);
             if (server == null || server.server == "")
             {
                 throw new ArgumentException("No server configured");
@@ -432,11 +431,6 @@ namespace Shadowsocks.Controller
                 return;
             }
             Server server = ((ServerTimer)sender).Server;
-            IStrategy strategy = controller.GetCurrentStrategy();
-            if (strategy != null)
-            {
-                strategy.SetFailure(server);
-            }
             Logging.Info($"{server.FriendlyName()} timed out");
             remote.Close();
             RetryConnect();
@@ -479,12 +473,6 @@ namespace Shadowsocks.Controller
                 Logging.Debug($"Socket connected to {remote.RemoteEndPoint}");
 
                 var latency = DateTime.Now - _startConnectTime;
-                IStrategy strategy = controller.GetCurrentStrategy();
-                if (strategy != null)
-                {
-                    strategy.UpdateLatency(server, latency);
-                }
-
                 StartPipe();
             }
             catch (ArgumentException)
@@ -492,14 +480,6 @@ namespace Shadowsocks.Controller
             }
             catch (Exception e)
             {
-                if (server != null)
-                {
-                    IStrategy strategy = controller.GetCurrentStrategy();
-                    if (strategy != null)
-                    {
-                        strategy.SetFailure(server);
-                    }
-                }
                 Logging.LogUsefulException(e);
                 RetryConnect();
             }
@@ -549,12 +529,6 @@ namespace Shadowsocks.Controller
                     }
                     Logging.Debug(remote, bytesToSend, "TCP Relay", "@PipeRemoteReceiveCallback() (download)");
                     connection.BeginSend(remoteSendBuffer, 0, bytesToSend, 0, new AsyncCallback(PipeConnectionSendCallback), null);
-
-                    IStrategy strategy = controller.GetCurrentStrategy();
-                    if (strategy != null)
-                    {
-                        strategy.UpdateLastRead(server);
-                    }
                 }
                 else
                 {
@@ -602,12 +576,6 @@ namespace Shadowsocks.Controller
                     Logging.Debug(remote, bytesToSend, "TCP Relay", "@PipeConnectionReceiveCallback() (upload)");
                     tcprelay.UpdateOutboundCounter(bytesToSend);
                     remote.BeginSend(connetionSendBuffer, 0, bytesToSend, 0, new AsyncCallback(PipeRemoteSendCallback), null);
-
-                    IStrategy strategy = controller.GetCurrentStrategy();
-                    if (strategy != null)
-                    {
-                        strategy.UpdateLastWrite(server);
-                    }
                 }
                 else
                 {

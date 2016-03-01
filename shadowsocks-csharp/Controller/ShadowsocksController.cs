@@ -8,7 +8,6 @@ using System.Threading;
 
 using Newtonsoft.Json;
 
-using Shadowsocks.Controller.Strategy;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using Shadowsocks.Util;
@@ -27,11 +26,8 @@ namespace Shadowsocks.Controller
         private Listener _listener;
         private PACServer _pacServer;
         private Configuration _config;
-        private StrategyManager _strategyManager;
         private PolipoRunner polipoRunner;
         private GFWListUpdater gfwListUpdater;
-        public AvailabilityStatistics availabilityStatistics { get; private set; }
-        public StatisticsStrategyConfiguration StatisticsConfiguration { get; private set; }
 
         public long inboundCounter = 0;
         public long outboundCounter = 0;
@@ -63,8 +59,6 @@ namespace Shadowsocks.Controller
         public ShadowsocksController()
         {
             _config = Configuration.Load();
-            StatisticsConfiguration = StatisticsStrategyConfiguration.Load();
-            _strategyManager = new StrategyManager(this);
             StartReleasingMemory();
         }
 
@@ -98,34 +92,8 @@ namespace Shadowsocks.Controller
             return _config;
         }
 
-        public IList<IStrategy> GetStrategies()
+        public Server GetAServer(IPEndPoint localIPEndPoint)
         {
-            return _strategyManager.GetStrategies();
-        }
-
-        public IStrategy GetCurrentStrategy()
-        {
-            foreach (var strategy in _strategyManager.GetStrategies())
-            {
-                if (strategy.ID == this._config.strategy)
-                {
-                    return strategy;
-                }
-            }
-            return null;
-        }
-
-        public Server GetAServer(IStrategyCallerType type, IPEndPoint localIPEndPoint)
-        {
-            IStrategy strategy = GetCurrentStrategy();
-            if (strategy != null)
-            {
-                return strategy.GetAServer(type, localIPEndPoint);
-            }
-            if (_config.index < 0)
-            {
-                _config.index = 0;
-            }
             return GetCurrentServer();
         }
 
@@ -134,12 +102,6 @@ namespace Shadowsocks.Controller
             _config.configs = servers;
             _config.localPort = localPort;
             Configuration.Save(_config);
-        }
-
-        public void SaveStrategyConfigurations(StatisticsStrategyConfiguration configuration)
-        {
-            StatisticsConfiguration = configuration;
-            StatisticsStrategyConfiguration.Save(configuration);
         }
 
         public bool AddServerBySSURL(string ssURL)
@@ -265,14 +227,6 @@ namespace Shadowsocks.Controller
             }
         }
 
-        public void UpdateStatisticsConfiguration(bool enabled)
-        {
-            if (availabilityStatistics == null) return;
-            availabilityStatistics.UpdateConfiguration(_config, StatisticsConfiguration);
-            _config.availabilityStatistics = enabled;
-            SaveConfig(_config);
-        }
-
         public void SavePACUrl(string pacUrl)
         {
             _config.pacUrl = pacUrl;
@@ -317,11 +271,10 @@ namespace Shadowsocks.Controller
             Interlocked.Add(ref outboundCounter, n);
         }
 
-        protected void Reload()
+        public void Reload()
         {
             // some logic in configuration updated the config when saving, we need to read it again
             _config = Configuration.Load();
-            StatisticsConfiguration = StatisticsStrategyConfiguration.Load();
 
             if (polipoRunner == null)
             {
@@ -341,12 +294,6 @@ namespace Shadowsocks.Controller
                 gfwListUpdater.Error += pacServer_PACUpdateError;
             }
 
-            if (availabilityStatistics == null)
-            {
-                availabilityStatistics = new AvailabilityStatistics(_config, StatisticsConfiguration);
-            }
-            availabilityStatistics.UpdateConfiguration(_config, StatisticsConfiguration);
-
             if (_listener != null)
             {
                 _listener.Stop();
@@ -358,12 +305,6 @@ namespace Shadowsocks.Controller
             polipoRunner.Stop();
             try
             {
-                var strategy = GetCurrentStrategy();
-                if (strategy != null)
-                {
-                    strategy.ReloadServers();
-                }
-
                 polipoRunner.Start(_config);
 
                 TCPRelay tcpRelay = new TCPRelay(this);

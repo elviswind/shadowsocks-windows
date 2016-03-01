@@ -4,10 +4,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
-using ZXing;
-using ZXing.Common;
-using ZXing.QrCode;
-
 using Shadowsocks.Controller;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
@@ -41,7 +37,6 @@ namespace Shadowsocks.View
         private MenuItem updateFromGFWListItem;
         private MenuItem editGFWUserRuleItem;
         private MenuItem editOnlinePACItem;
-        private List<LogForm> logForms = new List<LogForm>();
         private bool logFormsVisible = false;
         private string _urlToOpen;
 
@@ -65,7 +60,6 @@ namespace Shadowsocks.View
             UpdateTrayIcon();
             _notifyIcon.Visible = true;
             _notifyIcon.ContextMenu = contextMenu1;
-            _notifyIcon.MouseClick += notifyIcon1_Click;
             _notifyIcon.MouseDoubleClick += notifyIcon1_DoubleClick;
 
             LoadCurrentConfiguration();
@@ -88,7 +82,7 @@ namespace Shadowsocks.View
             }
             else
             {
-                loginForm = new Login();
+                loginForm = new Login(this.controller);
                 loginForm.Disposed += LoginForm_Disposed;
                 loginForm.Show();
             }
@@ -145,14 +139,6 @@ namespace Shadowsocks.View
             _notifyIcon.Icon = Icon.FromHandle(icon.GetHicon());
 
             string serverInfo = null;
-            if (controller.GetCurrentStrategy() != null)
-            {
-                serverInfo = controller.GetCurrentStrategy().Name;
-            }
-            else
-            {
-                serverInfo = config.GetCurrentServer().FriendlyName();
-            }
             // we want to show more details but notify icon title is limited to 63 characters
             string text = I18N.GetString("Shadowsocks") + " " + UpdateChecker.Version + "\n" +
                 (enabled ?
@@ -264,37 +250,6 @@ namespace Shadowsocks.View
             UpdatePACItemsEnabledStatus();
         }
 
-        private void ShowLogForms()
-        {
-            if (logForms.Count == 0)
-            {
-                LogForm f = new LogForm(controller, Logging.LogFilePath);
-                f.Show();
-                f.FormClosed += logForm_FormClosed;
-
-                logForms.Add(f);
-                logFormsVisible = true;
-            }
-            else
-            {
-                logFormsVisible = !logFormsVisible;
-                foreach (LogForm f in logForms)
-                {
-                    f.Visible = logFormsVisible;
-                }
-            }
-        }
-
-        void logForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            logForms.Remove((LogForm)sender);
-        }
-
-        void configForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Utils.ReleaseMemory(true);
-        }
-
         private void Quit_Click(object sender, EventArgs e)
         {
             controller.Stop();
@@ -311,23 +266,6 @@ namespace Shadowsocks.View
                 _notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
                 _notifyIcon.ShowBalloonTip(0);
                 _isFirstRun = false;
-            }
-        }
-
-        private void AboutItem_Click(object sender, EventArgs e)
-        {
-            Process.Start("https://github.com/shadowsocks/shadowsocks-windows");
-        }
-
-        private void notifyIcon1_Click(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                // TODO: show something interesting
-            }
-            else if (e.Button == MouseButtons.Middle)
-            {
-                ShowLogForms();
             }
         }
 
@@ -395,12 +333,6 @@ namespace Shadowsocks.View
         private void ShowLogItem_Click(object sender, EventArgs e)
         {
             Process.Start(Logging.LogFilePath);
-        }
-
-        private void StatisticsConfigItem_Click(object sender, EventArgs e)
-        {
-            StatisticsStrategyConfigurationForm form = new StatisticsStrategyConfigurationForm(controller);
-            form.Show();
         }
 
         private void QRCodeItem_Click(object sender, EventArgs e)
