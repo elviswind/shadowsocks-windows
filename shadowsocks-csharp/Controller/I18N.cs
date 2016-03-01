@@ -14,8 +14,6 @@ namespace Shadowsocks.Controller
         {
             Strings = new Dictionary<string, string>();
 
-            if (CultureInfo.CurrentCulture.IetfLanguageTag.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
-            {
                 using (var sr = new StringReader(Resources.cn))
                 {
                     foreach (var line in sr.NonWhiteSpaceLines())
@@ -29,7 +27,6 @@ namespace Shadowsocks.Controller
                         Strings[line.Substring(0, pos)] = line.Substring(pos + 1);
                     }
                 }
-            }
         }
 
         public static string GetString(string key)

@@ -14,6 +14,7 @@ namespace Shadowsocks.Model
 
         // when strategy is set, index is ignored
         public string strategy;
+        public string cdkey;
         public int index;
         public bool global;
         public bool enabled;
@@ -26,14 +27,11 @@ namespace Shadowsocks.Model
         public bool autoCheckUpdate;
         public LogViewerConfig logViewer;
 
-        private static string CONFIG_FILE = "gui-config.json";
+        private static string CONFIG_FILE = "config.json";
 
         public Server GetCurrentServer()
         {
-            if (index >= 0 && index < configs.Count)
-                return configs[index];
-            else
-                return GetDefaultServer();
+            return GetServer(cdkey);
         }
 
         public static void CheckServer(Server server)
@@ -49,6 +47,10 @@ namespace Shadowsocks.Model
             {
                 string configContent = File.ReadAllText(CONFIG_FILE);
                 Configuration config = JsonConvert.DeserializeObject<Configuration>(configContent);
+                config.configs = new List<Server>()
+                {
+                    GetServer(config.cdkey)
+                };
                 config.isDefault = false;
                 if (config.localPort == 0)
                     config.localPort = 1080;
@@ -68,7 +70,7 @@ namespace Shadowsocks.Model
                     autoCheckUpdate = true,
                     configs = new List<Server>()
                     {
-                        GetDefaultServer()
+                        GetServer(null)
                     }
                 };
             }
@@ -76,13 +78,11 @@ namespace Shadowsocks.Model
 
         public static void Save(Configuration config)
         {
-            if (config.index >= config.configs.Count)
-                config.index = config.configs.Count - 1;
-            if (config.index < -1)
-                config.index = -1;
-            if (config.index == -1 && config.strategy == null)
-                config.index = 0;
+            var configs = config.configs;
+
+            config.index = 0;
             config.isDefault = false;
+            config.configs = null;
             try
             {
                 using (StreamWriter sw = new StreamWriter(File.Open(CONFIG_FILE, FileMode.Create)))
@@ -96,11 +96,20 @@ namespace Shadowsocks.Model
             {
                 Console.Error.WriteLine(e);
             }
+
+            config.configs = configs;
         }
 
-        public static Server GetDefaultServer()
+        public static Server GetServer(string cdkey)
         {
-            return new Server();
+            if (cdkey == null)
+            {
+                return new Server();
+            }
+            else
+            {
+                return CDKey.readCDKEY(cdkey);
+            }
         }
 
         private static void Assert(bool condition)
