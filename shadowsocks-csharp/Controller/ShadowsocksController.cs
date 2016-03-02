@@ -311,6 +311,8 @@ namespace Shadowsocks.Controller
                 gfwListUpdater.Error += pacServer_PACUpdateError;
             }
 
+            availabilityStatistics.UpdateConfiguration(this);
+
             if (_listener != null)
             {
                 _listener.Stop();
