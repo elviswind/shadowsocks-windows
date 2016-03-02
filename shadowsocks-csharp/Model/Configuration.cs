@@ -65,6 +65,7 @@ namespace Shadowsocks.Model
                 return new Configuration
                 {
                     index = 0,
+                    enabled = true,
                     isDefault = true,
                     localPort = 1080,
                     autoCheckUpdate = true,

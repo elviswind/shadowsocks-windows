@@ -88,6 +88,7 @@ namespace Shadowsocks.View
         private void LoginForm_Disposed(object sender, EventArgs e)
         {
             Utils.ReleaseMemory(true);
+            ShowFirstTimeBalloon();
             loginForm = null;
         }
 
