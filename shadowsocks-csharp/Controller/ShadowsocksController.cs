@@ -28,6 +28,7 @@ namespace Shadowsocks.Controller
         private Configuration _config;
         private PolipoRunner polipoRunner;
         private GFWListUpdater gfwListUpdater;
+        public AvailabilityStatistics availabilityStatistics = AvailabilityStatistics.Instance;
 
         public long inboundCounter = 0;
         public long outboundCounter = 0;
