@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using Shadowsocks.Model;
@@ -261,14 +261,30 @@ namespace Shadowsocks.Controller
             Configuration.Save(_config);
         }
 
-        public void UpdateInboundCounter(long n)
+        public void UpdateLatency(Server server, TimeSpan latency)
         {
-            Interlocked.Add(ref inboundCounter, n);
+            if (_config.availabilityStatistics)
+            {
+                new Task(() => availabilityStatistics.UpdateLatency(server, (int) latency.TotalMilliseconds)).Start();
+            }
         }
 
-        public void UpdateOutboundCounter(long n)
+        public void UpdateInboundCounter(Server server, long n)
+        {
+            Interlocked.Add(ref inboundCounter, n);
+            if (_config.availabilityStatistics)
+            {
+                new Task(() => availabilityStatistics.UpdateInboundCounter(server, n)).Start();
+            }
+        }
+
+        public void UpdateOutboundCounter(Server server, long n)
         {
             Interlocked.Add(ref outboundCounter, n);
+            if (_config.availabilityStatistics)
+            {
+                new Task(() => availabilityStatistics.UpdateOutboundCounter(server, n)).Start();
+            }
         }
 
         public void Reload()
@@ -442,5 +458,6 @@ namespace Shadowsocks.Controller
                 Thread.Sleep(30 * 1000);
             }
         }
+
     }
 }

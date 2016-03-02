@@ -68,14 +68,19 @@ namespace Shadowsocks.Controller
             return true;
         }
 
-        public void UpdateInboundCounter(long n)
+        public void UpdateInboundCounter(Server server, long n)
         {
-            _controller.UpdateInboundCounter(n);
+            _controller.UpdateInboundCounter(server, n);
         }
 
-        public void UpdateOutboundCounter(long n)
+        public void UpdateOutboundCounter(Server server, long n)
         {
-            _controller.UpdateOutboundCounter(n);
+            _controller.UpdateOutboundCounter(server, n);
+        }
+
+        public void UpdateLatency(Server server, TimeSpan latency)
+        {
+            _controller.UpdateLatency(server, latency);
         }
     }
 
@@ -125,6 +130,9 @@ namespace Shadowsocks.Controller
         private object decryptionLock = new object();
 
         private DateTime _startConnectTime;
+        private DateTime _startReceivingTime;
+        private DateTime _startSendingTime;
+        private int _bytesToSend;
         private TCPRelay tcprelay;  // TODO: tcprelay ?= relay
 
         public TCPHandler(TCPRelay tcprelay)
@@ -473,6 +481,7 @@ namespace Shadowsocks.Controller
                 Logging.Debug($"Socket connected to {remote.RemoteEndPoint}");
 
                 var latency = DateTime.Now - _startConnectTime;
+                tcprelay.UpdateLatency(server, latency);
                 StartPipe();
             }
             catch (ArgumentException)
@@ -493,6 +502,7 @@ namespace Shadowsocks.Controller
             }
             try
             {
+                _startReceivingTime = DateTime.Now;
                 remote.BeginReceive(remoteRecvBuffer, 0, RecvSize, 0, new AsyncCallback(PipeRemoteReceiveCallback), null);
                 connection.BeginReceive(connetionRecvBuffer, 0, RecvSize, 0, new AsyncCallback(PipeConnectionReceiveCallback), null);
             }
@@ -513,7 +523,7 @@ namespace Shadowsocks.Controller
             {
                 int bytesRead = remote.EndReceive(ar);
                 totalRead += bytesRead;
-                tcprelay.UpdateInboundCounter(bytesRead);
+                tcprelay.UpdateInboundCounter(server, bytesRead);
 
                 if (bytesRead > 0)
                 {
@@ -574,7 +584,9 @@ namespace Shadowsocks.Controller
                         encryptor.Encrypt(connetionRecvBuffer, bytesRead, connetionSendBuffer, out bytesToSend);
                     }
                     Logging.Debug(remote, bytesToSend, "TCP Relay", "@PipeConnectionReceiveCallback() (upload)");
-                    tcprelay.UpdateOutboundCounter(bytesToSend);
+                    tcprelay.UpdateOutboundCounter(server, bytesToSend);
+                    _startSendingTime = DateTime.Now;
+                    _bytesToSend = bytesToSend;
                     remote.BeginSend(connetionSendBuffer, 0, bytesToSend, 0, new AsyncCallback(PipeRemoteSendCallback), null);
                 }
                 else

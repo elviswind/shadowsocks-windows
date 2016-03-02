@@ -31,7 +31,7 @@ change cdkey=修改cdkey
 Edit Servers=编辑服务器
 Load Balance=负载均衡
 High Availability=高可用
-Choose By Total Package Loss=累计丢包率
+Choose by statistics=根据统计
 
 # Config Form
 
