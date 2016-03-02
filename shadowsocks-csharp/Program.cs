@@ -19,7 +19,7 @@ namespace Shadowsocks
         static void Main()
         {
             Utils.ReleaseMemory(true);
-            using (Mutex mutex = new Mutex(false, "Global\\Shadowsocks_" + Application.StartupPath.GetHashCode()))
+            using (Mutex mutex = new Mutex(false, "Global\\baipass_" + Application.StartupPath.GetHashCode()))
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);

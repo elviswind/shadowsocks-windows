@@ -15,7 +15,7 @@ namespace Shadowsocks.Controller
         {
             try
             {
-                LogFilePath = Utils.GetTempPath("shadowsocks.log");
+                LogFilePath = Utils.GetTempPath("baipass.log");
 
                 FileStream fs = new FileStream(LogFilePath, FileMode.Append);
                 StreamWriterWithTimestamp sw = new StreamWriterWithTimestamp(fs);

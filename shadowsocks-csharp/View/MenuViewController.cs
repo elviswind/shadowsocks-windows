@@ -23,7 +23,6 @@ namespace Shadowsocks.View
         private ContextMenu contextMenu1;
 
         private bool _isFirstRun;
-        private bool _isStartupChecking;
         private MenuItem changeCDKEY;
         private MenuItem enableItem;
         private MenuItem modeItem;
@@ -37,8 +36,6 @@ namespace Shadowsocks.View
         private MenuItem updateFromGFWListItem;
         private MenuItem editGFWUserRuleItem;
         private MenuItem editOnlinePACItem;
-        private bool logFormsVisible = false;
-        private string _urlToOpen;
 
         public MenuViewController(ShadowsocksController controller)
         {
@@ -96,7 +93,7 @@ namespace Shadowsocks.View
 
         void controller_Errored(object sender, System.IO.ErrorEventArgs e)
         {
-            MessageBox.Show(e.GetException().ToString(), String.Format(I18N.GetString("Shadowsocks Error: {0}"), e.GetException().Message));
+            MessageBox.Show(e.GetException().ToString(), String.Format(I18N.GetString("Error: {0}"), e.GetException().Message));
         }
 
         private void UpdateTrayIcon()
@@ -140,7 +137,7 @@ namespace Shadowsocks.View
 
             string serverInfo = null;
             // we want to show more details but notify icon title is limited to 63 characters
-            string text = I18N.GetString("Shadowsocks") + " " + UpdateChecker.Version + "\n" +
+            string text = I18N.GetString("baipass") + " " + UpdateChecker.Version + "\n" +
                 (enabled ?
                     I18N.GetString("System Proxy On: ") + (global ? I18N.GetString("Global") : I18N.GetString("PAC")) :
                     String.Format(I18N.GetString("Running: Port {0}"), config.localPort))  // this feedback is very important because they need to know Shadowsocks is running
@@ -333,19 +330,6 @@ namespace Shadowsocks.View
         private void ShowLogItem_Click(object sender, EventArgs e)
         {
             Process.Start(Logging.LogFilePath);
-        }
-
-        private void QRCodeItem_Click(object sender, EventArgs e)
-        {
-            QRCodeForm qrCodeForm = new QRCodeForm(controller.GetQRCodeForCurrentServer());
-            //qrCodeForm.Icon = this.Icon;
-            // TODO
-            qrCodeForm.Show();
-        }
-
-        void openURLFromQRCode(object sender, FormClosedEventArgs e)
-        {
-            Process.Start(_urlToOpen);
         }
 
         private void AutoStartupItem_Click(object sender, EventArgs e)

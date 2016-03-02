@@ -301,7 +301,7 @@ namespace Shadowsocks.Controller
                 }
                 else
                 {
-                    Logging.Debug("failed to recv data in Shadowsocks.Controller.TCPHandler.handshakeReceive2Callback()");
+                    Logging.Debug("failed to recv data in handshakeReceive2Callback()");
                     Close();
                 }
             }

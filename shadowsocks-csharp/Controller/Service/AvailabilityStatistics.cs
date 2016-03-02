@@ -19,7 +19,7 @@ namespace Shadowsocks.Controller
     public sealed class AvailabilityStatistics : IDisposable
     {
         public const string DateTimePattern = "yyyy-MM-dd HH:mm:ss";
-        private const string StatisticsFilesName = "shadowsocks.availability.json";
+        private const string StatisticsFilesName = "baipass.availability.json";
         public static string AvailabilityStatisticsFile;
         //static constructor to initialize every public static fields before refereced
         static AvailabilityStatistics()

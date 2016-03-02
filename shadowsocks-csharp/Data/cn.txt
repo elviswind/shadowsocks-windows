@@ -1,6 +1,7 @@
 # translation for Simplified Chinese
 
 Shadowsocks=Shadowsocks
+baipass=baipass
 
 # Menu items
 
@@ -76,7 +77,7 @@ Please input PAC Url=请输入 PAC 网址
 
 # Messages
 
-Shadowsocks Error: {0}=Shadowsocks 错误: {0}
+Shadowsocks Error: {0}=错误: {0}
 Port already in use=端口已被占用
 Illegal port number format=非法端口格式
 Please add at least one server=请添加至少一个服务器
@@ -87,7 +88,7 @@ Port can't be 8123=端口不能为 8123
 Shadowsocks {0} Update Found=Shadowsocks {0} 更新
 No update is available=没有可用的更新
 Click here to update=点击这里升级
-Shadowsocks is here=Shadowsocks 在这里
+Shadowsocks is here=我在这里
 You can turn on/off Shadowsocks in the context menu=可以在右键菜单中开关 Shadowsocks
 System Proxy Enabled=系统代理已启用
 System Proxy Disabled=系统代理未启用
